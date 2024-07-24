@@ -534,7 +534,7 @@ sub DisplayValueRender {
                 HEADER:
                 for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
                     my @Headerfields;
-                    for my $Counter ( 0 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
+                    for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
                         if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
                             push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
                         }
@@ -577,6 +577,7 @@ sub DisplayValueRender {
         }
     }
 
+    # TODO how to concatenate multiple grouped values?
     # set new line separator
     my $ItemSeparator = ', ';
 
