@@ -162,7 +162,15 @@ sub ValueSet {
 
 # Rother OSS / DynamicFieldDatabaseExtensions
     # delete DisplayValueRender cache
-    # $Kernel::OM->Get('Kernel::System::Cache')->Delete();
+    VALUEITEM:
+    for my $ValueItem ( @Values ) {
+        next VALUEITEM unless $ValueItem;
+
+        $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+            Type => 'DynamicFieldDB',
+            Key  => "$Param{DynamicFieldConfig}->{ID}-$ValueItem",
+        );
+    }
 
 # EO DynamicFieldDatabaseExtensions
     return $Success;
@@ -491,14 +499,16 @@ sub DisplayValueRender {
     my @ReadableTitles;
 
 # Rother OSS / DynamicFieldDatabaseExtensions
-    # TODO shift inside cache check
     my $DynamicFieldDBHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
-    $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::DynamicFieldDB' => {
-            DynamicFieldConfig => $Param{DynamicFieldConfig},
-        },
-    );
-    my $DynamicFieldDBObject = $Kernel::OM->Get('Kernel::System::DynamicFieldDB');
+    my $DynamicFieldDBObject;
+    if ( $DynamicFieldDBHeaders ) {
+        $Kernel::OM->ObjectParamAdd(
+            'Kernel::System::DynamicFieldDB' => {
+                DynamicFieldConfig => $Param{DynamicFieldConfig},
+            },
+        );
+        $DynamicFieldDBObject = $Kernel::OM->Get('Kernel::System::DynamicFieldDB');
+    }
 
 # EO DynamicFieldDatabaseExtensions
     VALUEITEM:
@@ -523,39 +533,54 @@ sub DisplayValueRender {
             );
 # Rother OSS / DynamicFieldDatabaseExtensions
 
-            if ( defined $DynamicFieldDBHeaders ) {
+            if ( $DynamicFieldDBHeaders ) {
 
-                my $SearchResult = $DynamicFieldDBObject->DatabaseSearchDetails(
-                    Config     => $Param{DynamicFieldConfig}->{Config},
-                    Identifier => $Item,
+                my $CachedData = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+                    Type => 'DynamicFieldDB',
+                    Key  => "$Param{DynamicFieldConfig}->{ID}-$Item",
                 );
+                if ( $CachedData ) {
+                    $ReadableValue = $CachedData;
+                }
+                else {
+                    my $SearchResult = $DynamicFieldDBObject->DatabaseSearchDetails(
+                        Config     => $Param{DynamicFieldConfig}->{Config},
+                        Identifier => $Item,
+                    );
 
-                my $GroupedString = '';
-                HEADER:
-                for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
-                    my @Headerfields;
-                    for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
-                        if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
-                            push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
+                    my $GroupedString = '';
+                    HEADER:
+                    for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
+                        my @Headerfields;
+                        for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
+                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
+                                push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
+                            }
+                        }
+
+                        next HEADER unless @Headerfields;
+
+                        if ( $Header ne 'General' ) {
+                            $GroupedString .= "<b>$Header</b><br/>";
+                        }
+
+                        for my $Field ( @Headerfields ) {
+                            my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
+                            my $CleanedData = $Param{LayoutObject}->Ascii2Html(
+                                Text => $ResultItem->{Data},
+                                Max  => $Param{ValueMaxChars} || '',
+                            );
+                            $GroupedString .= "<span>$CleanedData</span><br/>";
                         }
                     }
-
-                    next HEADER unless @Headerfields;
-
-                    if ( $Header ne 'General' ) {
-                        $GroupedString .= "<b>$Header</b><br/>";
-                    }
-
-                    for my $Field ( @Headerfields ) {
-                        my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
-                        my $CleanedData = $Param{LayoutObject}->Ascii2Html(
-                            Text => $ResultItem->{Data},
-                            Max  => $Param{ValueMaxChars} || '',
-                        );
-                        $GroupedString .= "<span>$CleanedData</span><br/>";
-                    }
+                    $ReadableValue = $GroupedString;
+                    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+                        Type  => 'DynamicFieldDB',
+                        Key   => "$Param{DynamicFieldConfig}->{ID}-$Item",
+                        Value => $ReadableValue,
+                        TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
+                    );
                 }
-                $ReadableValue = $GroupedString;
             }
 # EO DynamicFieldDatabaseExtensions
         }
