@@ -510,8 +510,8 @@ sub DisplayValueRender {
         $DynamicFieldDBObject = $Kernel::OM->Get('Kernel::System::DynamicFieldDB');
     }
 
-# EO DynamicFieldDatabaseExtensions
     my $HeadersUsed = 0;
+# EO DynamicFieldDatabaseExtensions
     VALUEITEM:
     for my $Item (@Values) {
 
