@@ -511,6 +511,7 @@ sub DisplayValueRender {
     }
 
 # EO DynamicFieldDatabaseExtensions
+    my $HeadersUsed = 0;
     VALUEITEM:
     for my $Item (@Values) {
 
@@ -575,13 +576,17 @@ sub DisplayValueRender {
                         }
                         push @GroupedStrings, join('<br/>', @HeaderStrings);
                     }
-                    $ReadableValue = join('<br/><br/>', @GroupedStrings);
-                    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-                        Type  => 'DynamicFieldDB',
-                        Key   => "$Param{DynamicFieldConfig}->{ID}-$Item",
-                        Value => $ReadableValue,
-                        TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
-                    );
+                    my $HeaderString = join('<br/><br/>', @GroupedStrings);
+                    if ( $HeaderString ) {
+                        $HeadersUsed = 1;
+                        $ReadableValue = $HeaderString;
+                        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+                            Type  => 'DynamicFieldDB',
+                            Key   => "$Param{DynamicFieldConfig}->{ID}-$Item",
+                            Value => $ReadableValue,
+                            TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
+                        );
+                    }
                 }
             }
 # EO DynamicFieldDatabaseExtensions
@@ -610,7 +615,7 @@ sub DisplayValueRender {
 #
 #     $Value = join $ItemSeparator, @ReadableValues;
 #     $Title = join $ItemSeparator, @ReadableTitles;
-    my $ValueSeparator = $DynamicFieldDBHeaders ? '<br/>---<br/>' : ', ';
+    my $ValueSeparator = $HeadersUsed ? '<br/>---<br/>' : ', ';
     my $TitleSeparator = ', ';
 
     $Value = join $ValueSeparator, @ReadableValues;
