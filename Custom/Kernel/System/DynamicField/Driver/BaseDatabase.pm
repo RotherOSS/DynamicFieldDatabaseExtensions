@@ -548,10 +548,11 @@ sub DisplayValueRender {
                         Identifier => $Item,
                     );
 
-                    my $GroupedString = '';
+                    my @GroupedStrings;
                     HEADER:
                     for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
                         my @Headerfields;
+                        my @HeaderStrings;
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
                             if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
                                 push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
@@ -561,7 +562,7 @@ sub DisplayValueRender {
                         next HEADER unless @Headerfields;
 
                         if ( $Header ne 'General' ) {
-                            $GroupedString .= "<b>$Header</b><br/>";
+                            push @HeaderStrings, "<b>$Header</b>";
                         }
 
                         for my $Field ( @Headerfields ) {
@@ -570,10 +571,11 @@ sub DisplayValueRender {
                                 Text => $ResultItem->{Data},
                                 Max  => $Param{ValueMaxChars} || '',
                             );
-                            $GroupedString .= "<span>$CleanedData</span><br/>";
+                            push @HeaderStrings, "<span>$CleanedData</span>";
                         }
+                        push @GroupedStrings, join('<br/>', @HeaderStrings);
                     }
-                    $ReadableValue = $GroupedString;
+                    $ReadableValue = join('<br/><br/>', @GroupedStrings);
                     $Kernel::OM->Get('Kernel::System::Cache')->Set(
                         Type  => 'DynamicFieldDB',
                         Key   => "$Param{DynamicFieldConfig}->{ID}-$Item",
@@ -602,12 +604,12 @@ sub DisplayValueRender {
         }
     }
 
-    # TODO how to concatenate multiple grouped values?
     # set new line separator
-    my $ItemSeparator = ', ';
+    my $ValueSeparator = $DynamicFieldDBHeaders ? '<br/>---<br/>' : ', ';
+    my $TitleSeparator = ', ';
 
-    $Value = join $ItemSeparator, @ReadableValues;
-    $Title = join $ItemSeparator, @ReadableTitles;
+    $Value = join $ValueSeparator, @ReadableValues;
+    $Title = join $TitleSeparator, @ReadableTitles;
 
     # set field link form config
     my $Link        = $Param{DynamicFieldConfig}->{Config}->{Link}        || '';
