@@ -6,7 +6,7 @@
     <Vendor>Rother OSS GmbH</Vendor>
     <URL>https://otobo.io/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">..</Description>
+    <Description Lang="en">The package DynamicFieldDatabaseExtensions provides the possibility to extend the information displayed by dynamic field database values.</Description>
     <Filelist>
         <File Permission="660" Location="Custom/Kernel/Modules/AdminDynamicFieldDB.pm" />
         <File Permission="660" Location="Custom/Kernel/Output/HTML/Templates/Standard/AdminDynamicFieldDB.tt" />
