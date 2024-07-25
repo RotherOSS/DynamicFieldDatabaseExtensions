@@ -562,7 +562,7 @@ sub DisplayValueRender {
                         my @Headerfields;
                         my @HeaderStrings;
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
-                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $SanitizedHeader ) {
+                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
                                 push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
                             }
                         }
