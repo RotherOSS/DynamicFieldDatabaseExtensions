@@ -29,13 +29,13 @@ Usage
 After installation and activating the system configuration, a dropdown is added to the possible values elements in the AdminDynamicFieldDB screen (see picture 2). There you can choose a header under which the possible value should be layouted. An example layout of the TicketInformation widget in AgentTicketZoom is shown in picture 1.
 
 .. figure:: screenshot_01.png
-   :scale: 50%
+   :scale: 25%
    :alt: The sreenshot shows the newly available fields. 
 
    The screenshot shows the newly available fields for ticket creation.
 
 .. figure:: screenshot_02.png
-   :scale: 50%
+   :scale: 25%
    :alt: The sreenshot shows the newly available fields. 
 
    The screenshot shows the newly available fields for ticket creation.
