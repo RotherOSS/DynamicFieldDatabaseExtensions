@@ -605,11 +605,17 @@ sub DisplayValueRender {
     }
 
     # set new line separator
+# Rother OSS / DynamicFieldDatabaseExtensions
+#     my $ItemSeparator = ', ';
+#
+#     $Value = join $ItemSeparator, @ReadableValues;
+#     $Title = join $ItemSeparator, @ReadableTitles;
     my $ValueSeparator = $DynamicFieldDBHeaders ? '<br/>---<br/>' : ', ';
     my $TitleSeparator = ', ';
 
     $Value = join $ValueSeparator, @ReadableValues;
     $Title = join $TitleSeparator, @ReadableTitles;
+# EO DynamicFieldDatabaseExtensions
 
     # set field link form config
     my $Link        = $Param{DynamicFieldConfig}->{Config}->{Link}        || '';
