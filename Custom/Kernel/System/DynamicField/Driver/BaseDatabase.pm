@@ -554,7 +554,7 @@ sub DisplayValueRender {
                     for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
 
                         # sanitize header
-                        $Header = $Param{LayoutObject}->Ascii2Html(
+                        my $SanitizedHeader = $Param{LayoutObject}->Ascii2Html(
                             Text => $Header,
                             Max  => $Param{ValueMaxChars} || '',
                         );
@@ -562,15 +562,15 @@ sub DisplayValueRender {
                         my @Headerfields;
                         my @HeaderStrings;
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
-                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
+                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $SanitizedHeader ) {
                                 push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
                             }
                         }
 
                         next HEADER unless @Headerfields;
 
-                        if ( $Header ne 'General' ) {
-                            push @HeaderStrings, "<b>$Header</b>";
+                        if ( $SanitizedHeader ne 'General' ) {
+                            push @HeaderStrings, "<b>$SanitizedHeader</b>";
                         }
 
                         for my $Field ( @Headerfields ) {
