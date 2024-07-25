@@ -30,15 +30,15 @@ After installation and activating the system configuration, a dropdown is added 
 
 .. figure:: screenshot_01.png
    :scale: 35%
-   :alt: The sreenshot shows the newly available header dropdown in AdminDynamicFieldDB.
-
-   The screenshot shows the newly available header dropdown in AdminDynamicFieldDB.
-
-.. figure:: screenshot_02.png
-   :scale: 30%
    :alt: The sreenshot shows a layout example in the TicketInformation widget.
 
    The screenshot shows a layout example in the TicketInformation widget.
+
+.. figure:: screenshot_02.png
+   :scale: 30%
+   :alt: The sreenshot shows the newly available header dropdown in AdminDynamicFieldDB.
+
+   The screenshot shows the newly available header dropdown in AdminDynamicFieldDB.
 
 Setup
 -----
