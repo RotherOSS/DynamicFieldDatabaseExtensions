@@ -552,6 +552,13 @@ sub DisplayValueRender {
                     my @GroupedStrings;
                     HEADER:
                     for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
+
+                        # sanitize header
+                        $Header = $Param{LayoutObject}->Ascii2Html(
+                            Text => $Header,
+                            Max  => $Param{ValueMaxChars} || '',
+                        );
+
                         my @Headerfields;
                         my @HeaderStrings;
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
