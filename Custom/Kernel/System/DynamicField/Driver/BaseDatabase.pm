@@ -161,11 +161,12 @@ sub ValueSet {
     }
 
 # Rother OSS / DynamicFieldDatabaseExtensions
-    # delete DisplayValueRender cache
+    # delete DisplayValueRender cache per item
     VALUEITEM:
     for my $ValueItem ( @Values ) {
         next VALUEITEM unless $ValueItem;
 
+        # NOTE $ValueItem is the PossibleValues element marked as Identifier
         $Kernel::OM->Get('Kernel::System::Cache')->Delete(
             Type => 'DynamicFieldDB',
             Key  => "$Param{DynamicFieldConfig}->{ID}-$ValueItem",
@@ -500,6 +501,8 @@ sub DisplayValueRender {
 
 # Rother OSS / DynamicFieldDatabaseExtensions
     my $DynamicFieldDBHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+
+    # only initialize object if neccessary in an attempt to reduce database traffic
     my $DynamicFieldDBObject;
     if ( $DynamicFieldDBHeaders ) {
         $Kernel::OM->ObjectParamAdd(
@@ -510,6 +513,7 @@ sub DisplayValueRender {
         $DynamicFieldDBObject = $Kernel::OM->Get('Kernel::System::DynamicFieldDB');
     }
 
+    # flag if headers were actually used, to be able to maintain standard behavior if not
     my $HeadersUsed = 0;
 # EO DynamicFieldDatabaseExtensions
     VALUEITEM:
@@ -536,6 +540,8 @@ sub DisplayValueRender {
 
             if ( $DynamicFieldDBHeaders ) {
 
+                # fetch cached ReadableValue for item
+                # NOTE $Item is the PossibleValues element marked as Identifier
                 my $CachedData = $Kernel::OM->Get('Kernel::System::Cache')->Get(
                     Type => 'DynamicFieldDB',
                     Key  => "$Param{DynamicFieldConfig}->{ID}-$Item",
@@ -544,11 +550,16 @@ sub DisplayValueRender {
                     $ReadableValue = $CachedData;
                 }
                 else {
+
+                    # perform database search
+                    # NOTE using DatabaseSearchDetails to be able to restrict search to identifier
                     my $SearchResult = $DynamicFieldDBObject->DatabaseSearchDetails(
                         Config     => $Param{DynamicFieldConfig}->{Config},
                         Identifier => $Item,
                     );
 
+                    # array for collecting strings per header
+                    # NOTE using array to simplify concatenation later on
                     my @GroupedStrings;
                     HEADER:
                     for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
@@ -559,22 +570,32 @@ sub DisplayValueRender {
                             Max  => $Param{ValueMaxChars} || '',
                         );
 
+                        # collect fields associated to current header
                         my @Headerfields;
+
+                        # array for collecting strings per header field
+                        # NOTE using array to simplify concatenation later on
                         my @HeaderStrings;
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
+
+                            # NOTE using $Header for comparison instead of $SanitizedHeader because selected headers are not sanitized in AdminDynamicFieldDB
                             if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
                                 push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
                             }
                         }
 
+                        # skip headers with no associated fields
                         next HEADER unless @Headerfields;
 
+                        # do not print header for General
                         if ( $SanitizedHeader ne 'General' ) {
                             push @HeaderStrings, "<b>$SanitizedHeader</b>";
                         }
 
                         for my $Field ( @Headerfields ) {
                             my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
+
+                            # sanitize field data
                             my $CleanedData = $Param{LayoutObject}->Ascii2Html(
                                 Text => $ResultItem->{Data},
                                 Max  => $Param{ValueMaxChars} || '',
@@ -584,9 +605,13 @@ sub DisplayValueRender {
                         push @GroupedStrings, join('<br/>', @HeaderStrings);
                     }
                     my $HeaderString = join('<br/><br/>', @GroupedStrings);
+
+                    # overwrite ReadableValue and set cache
                     if ( $HeaderString ) {
                         $HeadersUsed = 1;
                         $ReadableValue = $HeaderString;
+
+                        # NOTE $Item is the PossibleValues element marked as Identifier
                         $Kernel::OM->Get('Kernel::System::Cache')->Set(
                             Type  => 'DynamicFieldDB',
                             Key   => "$Param{DynamicFieldConfig}->{ID}-$Item",
@@ -622,6 +647,7 @@ sub DisplayValueRender {
 #
 #     $Value = join $ItemSeparator, @ReadableValues;
 #     $Title = join $ItemSeparator, @ReadableTitles;
+    # using a custom value separator if header fields were used for formatting
     my $ValueSeparator = $HeadersUsed ? '<br/>---<br/>' : ', ';
     my $TitleSeparator = ', ';
 
