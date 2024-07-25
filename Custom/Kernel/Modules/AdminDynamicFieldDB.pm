@@ -900,7 +900,7 @@ sub _ShowScreen {
 
             $Param{SelectDisplayfield} = $LayoutObject->BuildSelection(
                 Data         => \@Headers,
-                Name         => "Displayfield_$ValueCounter",
+                Name         => "Displayfield",
                 Translation  => 0,
                 PossibleNone => 1,
                 Class        => 'Modernize',
