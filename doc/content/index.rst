@@ -42,7 +42,7 @@ After installation and activating the system configuration, a dropdown is added 
 
 Setup
 -----
-The package adds a system configuration setting DynamicFieldDB::DisplayfieldHeaders, in which you can define a list of headers to group dynamic field database possible values by. Notice that, despite not being present in the setting, the header General is always displayed in the newly added dropdown in the possible values elements in AdminDynamicFieldDB. Also, the entire feature will only be active if the system configuration setting is activated.
+To activate the package functionality, the newly added system configuration setting DynamicFieldDB::DisplayFieldHeaders needs to be activated. In the setting, you can define a list of headers to group dynamic field database possible values by. Notice that, despite not being present in the setting, the header General is always displayed in the newly added dropdown in the possible values elements in AdminDynamicFieldDB. Also, the entire feature will only be active if the system configuration setting is activated.
 
 Configuration Reference
 -----------------------
