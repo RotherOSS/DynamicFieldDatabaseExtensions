@@ -641,7 +641,10 @@ sub DisplayValueRender {
                         # array for collecting strings per header field
                         # NOTE using array to simplify concatenation later on
                         my @HeaderStrings;
+                        DISPLAYFIELD:
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
+
+                            next DISPLAYFIELD unless $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"};
 
                             # NOTE using $Header for comparison instead of $SanitizedHeader because selected headers are not sanitized in AdminDynamicFieldDB
                             if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
