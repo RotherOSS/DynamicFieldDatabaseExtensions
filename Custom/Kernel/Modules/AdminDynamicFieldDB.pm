@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 # Rother OSS / DynamicFieldDatabaseExtensions
 
 # core modules
-use List::Util qw(none);
+use List::Util qw(uniq);
 
 # CPAN modules
 
@@ -978,16 +978,17 @@ sub _ShowScreen {
         );
 
 # Rother OSS / DynamicFieldDatabaseExtensions
-        # Build the select field for the display field headers.
-        my $DisplayfieldHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-        # check with defined if sysconfig is active
-        if ( defined $DisplayfieldHeaders ) {
+        # check if ExtendedValueStructure feature is activated
+        my $ExtendedValueStructure = $ConfigObject->Get('DynamicFieldDB::ExtendedValueStructure');
+        if ( $ExtendedValueStructure ) {
 
-            # ensure that header 'General' is present
-            my @Headers = $DisplayfieldHeaders->@*;
-            if ( none { $_ eq 'General' } @Headers ) {
-                push @Headers, 'General';
+            # Build the select field for the display field headers.
+            my @Headers = ('General');
+            my $DisplayfieldHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+            if ( IsArrayRefWithData($DisplayfieldHeaders) ) {
+                @Headers = uniq (@Headers, $DisplayfieldHeaders->@*);
             }
 
             $Param{SelectDisplayfield} = $LayoutObject->BuildSelection(
@@ -1036,16 +1037,17 @@ sub _ShowScreen {
     );
 
 # Rother OSS / DynamicFieldDatabaseExtensions
-        # Build the select field for the display field headers.
-        my $DisplayfieldHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-        # check with defined if sysconfig is active
-        if ( defined $DisplayfieldHeaders ) {
+        # check if ExtendedValueStructure feature is activated
+        my $ExtendedValueStructure = $ConfigObject->Get('DynamicFieldDB::ExtendedValueStructure');
+        if ( $ExtendedValueStructure ) {
 
-            # ensure that header 'General' is present
-            my @Headers = $DisplayfieldHeaders->@*;
-            if ( none { $_ eq 'General' } @Headers ) {
-                push @Headers, 'General';
+            # Build the select field for the display field headers.
+            my @Headers = ('General');
+            my $DisplayfieldHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+            if ( IsArrayRefWithData($DisplayfieldHeaders) ) {
+                @Headers = uniq (@Headers, $DisplayfieldHeaders->@*);
             }
 
             $Param{SelectDisplayfield} = $LayoutObject->BuildSelection(

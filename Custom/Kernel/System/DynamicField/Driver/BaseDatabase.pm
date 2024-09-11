@@ -29,6 +29,9 @@ use utf8;
 use parent qw(Kernel::System::DynamicField::Driver::Base);
 
 # core modules
+# Rother OSS / DynamicFieldDatabaseExtensions
+use List::Util qw(uniq);
+# EO DynamicFieldDatabaseExtensions
 
 # CPAN modules
 
@@ -572,17 +575,23 @@ sub DisplayValueRender {
     my @ReadableTitles;
 
 # Rother OSS / DynamicFieldDatabaseExtensions
-    my $DynamicFieldDBHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
-
     # only initialize object if neccessary in an attempt to reduce database traffic
     my $DynamicFieldDBObject;
-    if ( $DynamicFieldDBHeaders ) {
+    my $ExtendedValueStructure = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::ExtendedValueStructure');
+    my @Headers = ('General');
+    if ( $ExtendedValueStructure ) {
         $Kernel::OM->ObjectParamAdd(
             'Kernel::System::DynamicFieldDB' => {
                 DynamicFieldConfig => $Param{DynamicFieldConfig},
             },
         );
         $DynamicFieldDBObject = $Kernel::OM->Get('Kernel::System::DynamicFieldDB');
+
+        # build header list
+        my $DisplayfieldHeaders = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::DisplayfieldHeaders');
+        if ( IsArrayRefWithData($DisplayfieldHeaders) ) {
+            @Headers = uniq (@Headers, $DisplayfieldHeaders->@*);
+        }
     }
 
     # flag if headers were actually used, to be able to maintain standard behavior if not
@@ -603,7 +612,7 @@ sub DisplayValueRender {
 #                 Text => $ValueItem,
 #                 Max  => $Param{ValueMaxChars},
 #             );
-            if ( $DynamicFieldDBHeaders ) {
+            if ( $ExtendedValueStructure ) {
 
                 # fetch cached ReadableValue for item
                 # NOTE $ValueItem is the PossibleValues element marked as Identifier
@@ -627,7 +636,7 @@ sub DisplayValueRender {
                     # NOTE using array to simplify concatenation later on
                     my @GroupedStrings;
                     HEADER:
-                    for my $Header ( 'General', $DynamicFieldDBHeaders->@* ) {
+                    for my $Header ( @Headers ) {
 
                         # sanitize header
                         my $SanitizedHeader = $Param{LayoutObject}->Ascii2Html(
