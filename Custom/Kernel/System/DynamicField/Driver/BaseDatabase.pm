@@ -570,6 +570,9 @@ sub DisplayValueRender {
         :                            ('');
 
     $Param{ValueMaxChars} ||= '';
+# Rother OSS / DynamicFieldDatabaseExtensions
+    my $ExtendedValue = $Param{ExtendedValue} ? 1 : 0;
+# EO DynamicFieldDatabaseExtensions
 
     my @ReadableValues;
     my @ReadableTitles;
@@ -579,7 +582,7 @@ sub DisplayValueRender {
     my $DynamicFieldDBObject;
     my $ExtendedValueStructure = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::ExtendedValueStructure');
     my @Headers = ('General');
-    if ( $ExtendedValueStructure ) {
+    if ( $ExtendedValueStructure && $Param{ExtendedValue} ) {
         $Kernel::OM->ObjectParamAdd(
             'Kernel::System::DynamicFieldDB' => {
                 DynamicFieldConfig => $Param{DynamicFieldConfig},
@@ -612,7 +615,7 @@ sub DisplayValueRender {
 #                 Text => $ValueItem,
 #                 Max  => $Param{ValueMaxChars},
 #             );
-            if ( $ExtendedValueStructure ) {
+            if ( $ExtendedValueStructure && $ExtendedValue ) {
 
                 # fetch cached ReadableValue for item
                 # NOTE $ValueItem is the PossibleValues element marked as Identifier
