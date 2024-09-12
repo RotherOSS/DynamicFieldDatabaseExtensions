@@ -2079,7 +2079,19 @@ sub _Mask {
             },
         );
 
-        if ( $DynamicFieldConfig->{Config}->{Link} ) {
+# Rother OSS / DynamicFieldDatabaseExtensions
+#         if ( $DynamicFieldConfig->{Config}->{Link} ) {
+        if ( $DynamicFieldConfig->{FieldType} eq 'Database' && $ConfigObject->Get('DynamicFieldDB::ExtendedValueStructure') ) {
+            $LayoutObject->Block(
+                Name => 'TicketDynamicFieldHTMLValue',
+                Data => {
+                    Value => $ValueStrg->{Value},
+                    Title => $ValueStrg->{Title},
+                },
+            );
+        }
+        elsif ( $DynamicFieldConfig->{Config}->{Link} ) {
+# EO DynamicFieldDatabaseExtensions
             $LayoutObject->Block(
                 Name => 'TicketDynamicFieldLink',
                 Data => {

@@ -495,7 +495,13 @@ sub Run {
 
             next FIELD;
         }
-        elsif ( $Field->{FieldType} eq 'Set' ) {
+# Rother OSS / DynamicFieldDatabaseExtensions
+#         elsif ( $Field->{FieldType} eq 'Set' ) {
+        elsif (
+            $Field->{FieldType} eq 'Set'
+            || ($Field->{FieldType} eq 'Database' && $ConfigObject->Get('DynamicFieldDB::ExtendedValueStructure'))
+        ) {
+# EO DynamicFieldDatabaseExtensions
 
             $LayoutObject->Block(
                 Name => 'TicketDynamicField',
