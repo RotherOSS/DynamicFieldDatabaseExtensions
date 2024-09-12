@@ -9,9 +9,14 @@
     <Description Lang="en">The package DynamicFieldDatabaseExtensions provides the possibility to extend the information displayed by dynamic field database values.</Description>
     <Filelist>
         <File Permission="660" Location="Custom/Kernel/Modules/AdminDynamicFieldDB.pm" />
+        <File Permission="660" Location="Custom/Kernel/Modules/AgentTicketZoom.pm" />
+        <File Permission="660" Location="Custom/Kernel/Modules/CustomerTicketZoom.pm" />
         <File Permission="660" Location="Custom/Kernel/Output/HTML/Templates/Standard/AdminDynamicFieldDB.tt" />
+        <File Permission="660" Location="Custom/Kernel/Output/HTML/Templates/Standard/CustomerTicketZoom/TicketInfo.tt" />
+        <File Permission="660" Location="Custom/Kernel/Output/HTML/TicketZoom/TicketInformation.pm" />
         <File Permission="660" Location="Custom/Kernel/System/DynamicField/Driver/BaseDatabase.pm" />
         <File Permission="660" Location="Kernel/Config/Files/XML/DynamicFieldDatabaseExtensions.xml" />
         <File Permission="660" Location="scripts/test/DynamicField/DynamicFieldDBExtensions.t" />
+        <File Permission="660" Location="var/httpd/htdocs/js/Core.Agent.TicketZoom.js" />
     </Filelist>
 </otobo_package>
