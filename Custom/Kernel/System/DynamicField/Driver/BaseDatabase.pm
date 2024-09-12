@@ -677,11 +677,14 @@ sub DisplayValueRender {
                                 Text => $ResultItem->{Data},
                                 Max  => $Param{ValueMaxChars} || '',
                             );
-                            push @HeaderStrings, "<span>$CleanedData</span>";
+                            push @HeaderStrings, "<span title=\"$ResultItem->{Data}\">$CleanedData</span>";
                         }
                         push @GroupedStrings, join('<br/>', @HeaderStrings);
                     }
                     my $HeaderString = join('<br/><br/>', @GroupedStrings);
+                    if ( $Param{LayoutObject}{SessionSource} && $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
+                        $HeaderString = '<p class="Value">' . $HeaderString . '</p>';
+                    }
 
                     # overwrite ReadableValue and set cache
                     if ( $HeaderString ) {
