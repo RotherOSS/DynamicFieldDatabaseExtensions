@@ -687,6 +687,7 @@ sub DisplayValueRender {
                     my $HeaderString = join('<br/><br/>', @GroupedStrings);
                     if ( $Param{LayoutObject}{SessionSource} && $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
                         $HeaderString = '<p class="Value">' . $HeaderString . '</p>';
+                        $HeaderString .= '<a href="#" class="DynamicFieldDBDetails AddButton" field="' . $Param{DynamicFieldConfig}->{ID} . '" alt="TestAltText" title="TestAltText" data-fieldname="DynamicField_' . $Param{DynamicFieldConfig}->{Name} . '" data-value="' . $ValueItem . '"><i class="fa fa-list-alt"></i></a>';
                     }
 
                     # overwrite ReadableValue and set cache
