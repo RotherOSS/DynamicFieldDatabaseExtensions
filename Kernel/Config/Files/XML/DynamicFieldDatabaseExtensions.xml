@@ -15,4 +15,30 @@
             </Array>
         </Value>
     </Setting>
+    <Setting Name="Loader::Module::AgentTicketZoom###003-DynamicFieldDatabaseExtensions" Required="0" Valid="1">
+        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="CSS">
+                    <Array>
+                        <Item>DynamicFieldDatabaseExtensions.TicketZoom.css</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Loader::Module::CustomerTicketZoom###003-DynamicFieldDatabaseExtensions" Required="0" Valid="1">
+        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="CSS">
+                    <Array>
+                        <Item>DynamicFieldDatabaseExtensions.TicketZoom.css</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
 </otobo_config>
