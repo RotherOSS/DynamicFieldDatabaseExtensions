@@ -2083,7 +2083,7 @@ sub _Mask {
 #         if ( $DynamicFieldConfig->{Config}->{Link} ) {
         if ( $DynamicFieldConfig->{FieldType} eq 'Database' && $ConfigObject->Get('DynamicFieldDB::ExtendedValueStructure') ) {
             $LayoutObject->Block(
-                Name => 'TicketDynamicFieldHTMLValue',
+                Name => 'TicketDynamicFieldPlain',
                 Data => {
                     Value => $ValueStrg->{Value},
                     Title => $ValueStrg->{Title},
