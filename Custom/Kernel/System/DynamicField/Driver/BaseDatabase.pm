@@ -616,6 +616,15 @@ sub DisplayValueRender {
 #                 Max  => $Param{ValueMaxChars},
 #             );
             if ( $ExtendedValueStructure && $ExtendedValue ) {
+                my $TemplateFile = '';
+                if ( $Param{LayoutObject}{SessionSource} ) {
+                    if ( $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
+                        $TemplateFile = 'DynamicField/Agent/BaseDatabaseDisplayValue';
+                    }
+                    elsif ( $Param{LayoutObject}{SessionSource} eq 'CustomerInterface' ) {
+                        $TemplateFile = 'DynamicField/Customer/BaseDatabaseDisplayValue';
+                    }
+                }
 
                 # fetch cached ReadableValue for item
                 # NOTE $ValueItem is the PossibleValues element marked as Identifier
@@ -636,8 +645,6 @@ sub DisplayValueRender {
                     );
 
                     # array for collecting strings per header
-                    # NOTE using array to simplify concatenation later on
-                    my @GroupedStrings;
                     HEADER:
                     for my $Header ( @Headers ) {
 
@@ -647,12 +654,17 @@ sub DisplayValueRender {
                             Max  => $Param{ValueMaxChars} || '',
                         );
 
+                        $Param{LayoutObject}->Block(
+                            Name => 'HeaderSection',
+                            Data => {
+                                HeaderName => $SanitizedHeader,
+                            },
+                        );
+
                         # collect fields associated to current header
                         my @Headerfields;
 
                         # array for collecting strings per header field
-                        # NOTE using array to simplify concatenation later on
-                        my @HeaderStrings;
                         DISPLAYFIELD:
                         for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
 
@@ -669,7 +681,12 @@ sub DisplayValueRender {
 
                         # do not print header for General
                         if ( $SanitizedHeader ne 'General' ) {
-                            push @HeaderStrings, "<b>$SanitizedHeader</b>";
+                            $Param{LayoutObject}->Block(
+                                Name => 'HeaderElement',
+                                Data => {
+                                    HeaderName => $SanitizedHeader,
+                                },
+                            );
                         }
 
                         for my $Field ( @Headerfields ) {
@@ -680,19 +697,23 @@ sub DisplayValueRender {
                                 Text => $ResultItem->{Data},
                                 Max  => $Param{ValueMaxChars} || '',
                             );
-                            push @HeaderStrings, "<span title=\"$ResultItem->{Data}\">$CleanedData</span>";
+                            $Param{LayoutObject}->Block(
+                                Name => 'ValueElement' ,
+                                Data => {
+                                    Data        => $ResultItem->{Data},
+                                    CleanedData => $CleanedData,
+                                },
+                            );
+                            $HeadersUsed = 1;
                         }
-                        push @GroupedStrings, join('<br/>', @HeaderStrings);
-                    }
-                    my $HeaderString = join('<br/><br/>', @GroupedStrings);
-                    if ( $Param{LayoutObject}{SessionSource} && $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
-                        $HeaderString = '<p class="Value">' . $HeaderString . '</p>';
-                        $HeaderString .= '<a href="#" class="DynamicFieldDBDetails AddButton" field="' . $Param{DynamicFieldConfig}->{ID} . '" alt="TestAltText" title="TestAltText" data-fieldname="DynamicField_' . $Param{DynamicFieldConfig}->{Name} . '" data-value="' . $ValueItem . '"><i class="fa fa-list-alt"></i></a>';
                     }
 
                     # overwrite ReadableValue and set cache
-                    if ( $HeaderString ) {
-                        $HeadersUsed = 1;
+                    if ( $HeadersUsed ) {
+
+                        my $HeaderString = $Param{LayoutObject}->Output(
+                            TemplateFile => $TemplateFile,
+                        );
 
                         # NOTE $ValueItem is the PossibleValues element marked as Identifier
                         $Kernel::OM->Get('Kernel::System::Cache')->Set(
@@ -725,11 +746,7 @@ sub DisplayValueRender {
             Text => $Title,
             Max  => $Param{TitleMaxChars} || '',
         );
-# Rother OSS / DynamicFieldDatabaseExtensions
-#         $ValueSeparator = '<br/>';
-        # using a custom value separator if header fields were used for formatting
-        $ValueSeparator = $HeadersUsed ? '<br/>---<br/>' : '<br/>';
-# EO DynamicFieldDatabaseExtensions
+        $ValueSeparator = '<br/>';
     }
     else {
         if ( $Param{TitleMaxChars} && length($Title) > $Param{TitleMaxChars} ) {
@@ -737,6 +754,16 @@ sub DisplayValueRender {
         }
         $ValueSeparator = "\n";
     }
+# Rother OSS / DynamicFieldDatabaseExtensions
+
+    my $ValueStrg = '';
+    if ( $HeadersUsed && $Param{LayoutObject}{SessionSource} && $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
+        $ValueStrg = '<div class="DynamicFieldDBExtendedValue">' . join( $ValueSeparator, @ReadableValues ) . '</div>';
+    }
+    else {
+        $ValueStrg = '' . join( $ValueSeparator, @ReadableValues );
+    }
+# EO DynamicFieldDatabaseExtensions
 
     # set field link from config
     my $Link        = $Param{DynamicFieldConfig}->{Config}->{Link}        || '';
@@ -744,7 +771,10 @@ sub DisplayValueRender {
 
     # return a data structure
     return {
-        Value       => '' . join( $ValueSeparator, @ReadableValues ),
+# Rother OSS / DynamicFieldDatabaseExtensions
+#         Value       => '' . join( $ValueSeparator, @ReadableValues ),
+        Value       => $ValueStrg,
+# EO DynamicFieldDatabaseExtensions
         Title       => '' . $Title,
         Link        => $Link,
         LinkPreview => $LinkPreview,
