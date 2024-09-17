@@ -30,7 +30,7 @@
     </Setting>
     <Setting Name="Loader::Module::CustomerTicketZoom###003-DynamicFieldDatabaseExtensions" Required="0" Valid="1">
         <Description Translatable="1">Loader module registration for the agent interface.</Description>
-        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Navigation>Frontend::Customer::ModuleRegistration::Loader</Navigation>
         <Value>
             <Hash>
                 <Item Key="CSS">
