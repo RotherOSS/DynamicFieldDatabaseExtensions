@@ -17,6 +17,8 @@
         <File Permission="660" Location="Custom/Kernel/Output/HTML/TicketZoom/TicketInformation.pm" />
         <File Permission="660" Location="Custom/Kernel/System/DynamicField/Driver/BaseDatabase.pm" />
         <File Permission="660" Location="Kernel/Config/Files/XML/DynamicFieldDatabaseExtensions.xml" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/DynamicField/Agent/BaseDatabaseDisplayValue.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/DynamicField/Customer/BaseDatabaseDisplayValue.tt" />
         <File Permission="660" Location="scripts/test/DynamicField/DynamicFieldDBExtensions.t" />
     </Filelist>
 </otobo_package>
