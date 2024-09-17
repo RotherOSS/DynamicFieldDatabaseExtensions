@@ -19,6 +19,6 @@
     <b class="DynamicFieldDBExtendedValue">[% Data.HeaderName | html %]</b>
 [% RenderBlockEnd("HeaderElement") %]
 [% RenderBlockStart("ValueElement") %]
-    <span class="DynamicFieldDBExtendedValue" title="[% Data.Data | html %]">[% Data.CleanedData | html %]</span>
+    <span class="DynamicFieldDBExtendedValue" title="[% Data.Data | html %]">[% Data.CleanedData %]</span>
 [% RenderBlockEnd("ValueElement") %]
 [% RenderBlockEnd("HeaderSection") %]
