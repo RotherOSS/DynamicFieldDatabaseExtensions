@@ -21,5 +21,7 @@
         <File Permission="660" Location="scripts/test/DynamicField/DynamicFieldDBExtensions.t" />
         <File Permission="660" Location="var/httpd/htdocs/skins/Customer/default/css/DynamicFieldDatabaseExtensions.TicketZoom.css" />
         <File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/DynamicFieldDatabaseExtensions.TicketZoom.css" />
+        <File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/DynamicFieldDatabaseExtensions.ITSMConfigItemZoom.css" />
+        <File Permission="660" Location="var/httpd/htdocs/skins/Customer/default/css/DynamicFieldDatabaseExtensions.ITSMConfigItemZoom.css" />
     </Filelist>
 </otobo_package>
