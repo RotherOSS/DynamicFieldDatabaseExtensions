@@ -681,6 +681,8 @@ sub DisplayValueRender {
                     HEADER:
                     for my $Header ( @Headers ) {
 
+                        next HEADER unless IsArrayRefWithData($HeaderfieldsHash{$Header});
+
                         # sanitize header
                         my $SanitizedHeader = $Param{LayoutObject}->Ascii2Html(
                             Text => $Header,
@@ -704,7 +706,7 @@ sub DisplayValueRender {
                             );
                         }
 
-                        for my $Field ( $HeaderfieldsHash{$Header} ) {
+                        for my $Field ( $HeaderfieldsHash{$Header}->@* ) {
                             my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
 
                             # sanitize field data
