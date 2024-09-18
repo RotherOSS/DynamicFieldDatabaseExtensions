@@ -132,11 +132,14 @@ sub ValueSet {
     for my $ValueItem ( @ValueItems ) {
         next VALUEITEM unless $ValueItem;
 
-        # NOTE $ValueItem is the PossibleValues element marked as Identifier
-        $Kernel::OM->Get('Kernel::System::Cache')->Delete(
-            Type => 'DynamicFieldDB',
-            Key  => "$Param{DynamicFieldConfig}->{ID}-$ValueItem",
-        );
+        for my $Interface (qw(AgentInterface CustomerInterface)) {
+
+            # NOTE $ValueItem is the PossibleValues element marked as Identifier
+            $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+                Type => 'DynamicFieldDB',
+                Key  => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem",
+            );
+        }
     }
 
 # EO DynamicFieldDatabaseExtensions
@@ -715,10 +718,12 @@ sub DisplayValueRender {
                             TemplateFile => $TemplateFile,
                         );
 
+                        my $Interface = $Param{LayoutObject}{SessionSource} // '';
+
                         # NOTE $ValueItem is the PossibleValues element marked as Identifier
                         $Kernel::OM->Get('Kernel::System::Cache')->Set(
                             Type  => 'DynamicFieldDB',
-                            Key   => "$Param{DynamicFieldConfig}->{ID}-$ValueItem",
+                            Key   => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem",
                             Value => $HeaderString,
                             TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
                         );
