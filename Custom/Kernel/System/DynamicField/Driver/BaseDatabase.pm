@@ -620,6 +620,7 @@ sub DisplayValueRender {
 #             );
             if ( $ExtendedValueStructure && $ExtendedValue ) {
                 my $TemplateFile = '';
+                my $Interface = $Param{LayoutObject}{SessionSource} // '';
                 if ( $Param{LayoutObject}{SessionSource} ) {
                     if ( $Param{LayoutObject}{SessionSource} eq 'AgentInterface' ) {
                         $TemplateFile = 'DynamicField/Agent/BaseDatabaseDisplayValue';
@@ -633,7 +634,7 @@ sub DisplayValueRender {
                 # NOTE $ValueItem is the PossibleValues element marked as Identifier
                 my $CachedData = $Kernel::OM->Get('Kernel::System::Cache')->Get(
                     Type => 'DynamicFieldDB',
-                    Key  => "$Param{DynamicFieldConfig}->{ID}-$ValueItem",
+                    Key  => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem",
                 );
                 if ( $CachedData ) {
                     $ValueItem = $CachedData;
@@ -717,8 +718,6 @@ sub DisplayValueRender {
                         my $HeaderString = $Param{LayoutObject}->Output(
                             TemplateFile => $TemplateFile,
                         );
-
-                        my $Interface = $Param{LayoutObject}{SessionSource} // '';
 
                         # NOTE $ValueItem is the PossibleValues element marked as Identifier
                         $Kernel::OM->Get('Kernel::System::Cache')->Set(
