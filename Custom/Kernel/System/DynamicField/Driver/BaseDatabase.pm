@@ -602,6 +602,35 @@ sub DisplayValueRender {
 
     # flag if headers were actually used, to be able to maintain standard behavior if not
     my $HeadersUsed = 0;
+    my %HeaderfieldsHash;
+
+    # set headers used flag
+    if ( $ExtendedValueStructure ) {
+        HEADER:
+        for my $Header ( @Headers ) {
+
+            # collect fields associated to current header
+            my @Headerfields;
+
+            # array for collecting strings per header field
+            DISPLAYFIELD:
+            for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
+
+                next DISPLAYFIELD unless $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"};
+
+                # NOTE using $Header for comparison instead of $SanitizedHeader because selected headers are not sanitized in AdminDynamicFieldDB
+                if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
+                    push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
+                }
+            }
+
+            # skip headers with no associated fields
+            next HEADER unless @Headerfields;
+
+            $HeadersUsed = 1;
+            $HeaderfieldsHash{$Header} = \@Headerfields;
+        }
+    }
 # EO DynamicFieldDatabaseExtensions
     VALUEITEM:
     for my $ValueItem (@Values) {
@@ -665,24 +694,6 @@ sub DisplayValueRender {
                             },
                         );
 
-                        # collect fields associated to current header
-                        my @Headerfields;
-
-                        # array for collecting strings per header field
-                        DISPLAYFIELD:
-                        for my $Counter ( 1 .. $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ValueCounter} ) {
-
-                            next DISPLAYFIELD unless $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"};
-
-                            # NOTE using $Header for comparison instead of $SanitizedHeader because selected headers are not sanitized in AdminDynamicFieldDB
-                            if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
-                                push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
-                            }
-                        }
-
-                        # skip headers with no associated fields
-                        next HEADER unless @Headerfields;
-
                         # do not print header for General
                         if ( $SanitizedHeader ne 'General' ) {
                             $Param{LayoutObject}->Block(
@@ -693,7 +704,7 @@ sub DisplayValueRender {
                             );
                         }
 
-                        for my $Field ( @Headerfields ) {
+                        for my $Field ( $HeaderfieldsHash{$Header} ) {
                             my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
 
                             # sanitize field data
@@ -708,7 +719,6 @@ sub DisplayValueRender {
                                     CleanedData => $CleanedData,
                                 },
                             );
-                            $HeadersUsed = 1;
                         }
                     }
 
