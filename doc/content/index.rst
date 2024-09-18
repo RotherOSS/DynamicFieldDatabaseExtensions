@@ -54,6 +54,24 @@ DynamicFieldDB::DisplayfieldHeaders
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Define a list of headers to group dynamic field database possible values by. Notice: Header 'General' is always added if not defined.
 
+DynamicFieldDB::ExtendedValueStructure
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Activate or deactivate the extended value structure feature for dynamic fields of type database.
+
+Frontend::Agent::ModuleRegistration::Loader
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Loader::Module::AgentTicketZoom###003-DynamicFieldDatabaseExtensions
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Loader module registration for the agent interface.
+
+Frontend::Customer::ModuleRegistration::Loader
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Loader::Module::CustomerTicketZoom###003-DynamicFieldDatabaseExtensions
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Loader module registration for the agent interface.
+
 About
 =======
 
