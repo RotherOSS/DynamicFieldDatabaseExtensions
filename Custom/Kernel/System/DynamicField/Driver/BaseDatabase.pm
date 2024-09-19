@@ -618,9 +618,13 @@ sub DisplayValueRender {
 
                 next DISPLAYFIELD unless $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"};
 
+
                 # NOTE using $Header for comparison instead of $SanitizedHeader because selected headers are not sanitized in AdminDynamicFieldDB
                 if ( $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"Displayfield_$Counter"} eq $Header ) {
-                    push @Headerfields, $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"};
+                    push @Headerfields, {
+                        Name => $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldLabel_$Counter"},
+                        Type => $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{"FieldDatatype_$Counter"},
+                    };
                 }
             }
 
@@ -707,17 +711,24 @@ sub DisplayValueRender {
                         }
 
                         for my $Field ( $HeaderfieldsHash{$Header}->@* ) {
-                            my ($ResultItem) = grep { $_->{Label} eq $Field } $SearchResult->@*;
+                            my ($ResultItem) = grep { $_->{Label} eq $Field->{Name} } $SearchResult->@*;
+                            my $ValueItem = $ResultItem->{Data};
+                            if ( $Field->{Type} eq 'DATE' ) {
+                                $ValueItem = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
+                                    $ValueItem,
+                                    'DateFormat',
+                                );
+                            }
 
                             # sanitize field data
                             my $CleanedData = $Param{LayoutObject}->Ascii2Html(
-                                Text => $ResultItem->{Data},
+                                Text => $ValueItem,
                                 Max  => $Param{ValueMaxChars} || '',
                             );
                             $Param{LayoutObject}->Block(
                                 Name => 'ValueElement' ,
                                 Data => {
-                                    Data        => $ResultItem->{Data},
+                                    Data        => $ValueItem,
                                     CleanedData => $CleanedData,
                                 },
                             );
