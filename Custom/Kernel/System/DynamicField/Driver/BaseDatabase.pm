@@ -716,7 +716,7 @@ sub DisplayValueRender {
                             if ( $Field->{Type} eq 'DATE' ) {
                                 $ValueItem = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
                                     $ValueItem,
-                                    'DateFormat',
+                                    'DateFormatShort',
                                 );
                             }
 
