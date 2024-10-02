@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - dad545d4163015c483ac34c8cf8d153be7896d27 - Kernel/Modules/AgentTicketZoom.pm
+# $origin: otobo - 4c9926eb7703dcf6ca1f2652063f070fbe059560 - Kernel/Modules/AgentTicketZoom.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -836,7 +836,7 @@ sub MaskAgentZoom {
     my %MoveQueues = $TicketObject->MoveList(
         TicketID => $Ticket{TicketID},
         UserID   => $Self->{UserID},
-        Action   => $Self->{Action},
+        Action   => 'AgentTicketMove',
         Type     => 'move_into',
     );
 
@@ -1328,6 +1328,7 @@ sub MaskAgentZoom {
         $MoveQueues{0}         = '- ' . $LayoutObject->{LanguageObject}->Translate('Move') . ' -';
         $Param{MoveQueuesStrg} = $LayoutObject->AgentQueueListOption(
             Name           => 'DestQueueID',
+            TreeView       => $ConfigObject->Get('Ticket::Frontend::ListType') eq 'tree' ? 1 : 0,
             Data           => \%MoveQueues,
             Class          => 'Modernize Small',
             CurrentQueueID => $Ticket{QueueID},
@@ -2382,7 +2383,8 @@ sub _ArticleTree {
             Name => 'ArticleList',
             Data => {
                 %Param,
-                TableClasses => $TableClasses,
+                ZoomExpandSortOrder => $Self->{ZoomExpandSort} eq 'reverse' ? 'Descending' : 'Ascending',
+                TableClasses        => $TableClasses,
             },
         );
 

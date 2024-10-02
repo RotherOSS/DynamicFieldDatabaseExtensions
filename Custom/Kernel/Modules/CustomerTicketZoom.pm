@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 4dade81e7e04433cb2aed36af0c8727d822a1c61 - Kernel/Modules/CustomerTicketZoom.pm
+# $origin: otobo - cde1f5b5d3dc0b0608827d726bb9952409fb420c - Kernel/Modules/CustomerTicketZoom.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -2009,7 +2009,7 @@ sub _Mask {
 
     # standard ticket categories
     CAT:
-    for my $CatName (qw/Type Queue Service State Owner/) {
+    for my $CatName (qw/Priority Type Queue Service State Owner/) {
         next CAT if !$Param{$CatName};
         if ( $CategoryConfig->{$CatName} ) {
             my $Conf = $CategoryConfig->{$CatName};
