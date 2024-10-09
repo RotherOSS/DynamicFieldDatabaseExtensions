@@ -7,7 +7,7 @@
             <Item ValueType="Checkbox">1</Item>
         </Value>
     </Setting>
-    <Setting Name="DynamicFieldDB::DisplayfieldHeaders" Required="0" Valid="0">
+    <Setting Name="DynamicFieldDB::DisplayfieldHeaders" Required="0" Valid="1">
         <Description Translatable="1">Define a list of headers to group dynamic field database possible values by. Notice: Header 'General' is always added if not defined.</Description>
         <Navigation>Core::Ticket</Navigation>
         <Value>
