@@ -426,9 +426,6 @@ sub Run {
             Value              => $Ticket{"DynamicField_$DynamicFieldConfig->{Name}"},
             LayoutObject       => $LayoutObject,
             ValueMaxChars      => $ConfigObject->Get('Ticket::Frontend::DynamicFieldsZoomMaxSizeSidebar') || 18,    # limit for sidebar display
-# Rother OSS / DynamicFieldDatabaseExtensions
-            ExtendedValue      => 1,
-# EO DynamicFieldDatabaseExtensions
         );
 
         if ( $Self->{DisplaySettings}->{DynamicField}->{ $DynamicFieldConfig->{Name} } ) {

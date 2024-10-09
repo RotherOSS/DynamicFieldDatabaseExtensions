@@ -574,7 +574,17 @@ sub DisplayValueRender {
 
     $Param{ValueMaxChars} ||= '';
 # Rother OSS / DynamicFieldDatabaseExtensions
-    my $ExtendedValue = $Param{ExtendedValue} ? 1 : 0;
+    my $ExtendedValue = 0;
+    if ( $Param{LayoutObject} ) {
+        my %ExtendedValueActions = (
+            'AgentITSMConfigItemZoom'    => 1,
+            'AgentTicketZoom'            => 1,
+            'CustomerITSMConfigItemZoom' => 1,
+            'CustomerTicketZoom'         => 1,
+        );
+        $ExtendedValue = $ExtendedValueActions{$Param{LayoutObject}{Action}} ? 1 : 0;
+    }
+
 # EO DynamicFieldDatabaseExtensions
 
     my @ReadableValues;
@@ -585,7 +595,7 @@ sub DisplayValueRender {
     my $DynamicFieldDBObject;
     my $ExtendedValueStructure = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFieldDB::ExtendedValueStructure');
     my @Headers = ('General');
-    if ( $ExtendedValueStructure && $Param{ExtendedValue} ) {
+    if ( $ExtendedValueStructure && $ExtendedValue ) {
         $Kernel::OM->ObjectParamAdd(
             'Kernel::System::DynamicFieldDB' => {
                 DynamicFieldConfig => $Param{DynamicFieldConfig},
@@ -743,12 +753,15 @@ sub DisplayValueRender {
                         );
 
                         # NOTE $ValueItem is the PossibleValues element marked as Identifier
-                        $Kernel::OM->Get('Kernel::System::Cache')->Set(
-                            Type  => 'DynamicFieldDB',
-                            Key   => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem",
-                            Value => $HeaderString,
-                            TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
-                        );
+                        if ( $Param{DynamicFieldConfig}->{Config}->{CacheTTL} ) {
+                            $Kernel::OM->Get('Kernel::System::Cache')->Set(
+                                Type  => 'DynamicFieldDB',
+                                Key   => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem",
+                                Value => $HeaderString,
+                                TTL   => $Param{DynamicFieldConfig}->{Config}->{CacheTTL},
+                            );
+                        }
+
                         $ValueItem = $HeaderString;
                     }
                 }
