@@ -2,9 +2,9 @@
 # OTOBO is a web-based ticketing system for service organisations.
 # --
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - c14ca55a8b1d3d686e803c1398813b83d22091e5 - Kernel/System/DynamicField/Driver/BaseDatabase.pm
+# $origin: otobo - ff9e297baf287e16071d3ac6ad7f6c13f11ac7fa - Kernel/System/DynamicField/Driver/BaseDatabase.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -292,9 +292,12 @@ sub EditFieldRender {
     my ( $Self, %Param ) = @_;
 
     # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldName   = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
+    my $FieldConfig       = $Param{DynamicFieldConfig}->{Config};
+    my $FieldName         = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
+    my $FieldLabel        = $Param{DynamicFieldConfig}->{Label};
+    my $FieldLabelEscaped = $Param{LayoutObject}->Ascii2Html(
+        Text => $Param{LayoutObject}->{LanguageObject}->Translate($FieldLabel),
+    );
 
     my $Value = '';
 
@@ -351,7 +354,7 @@ sub EditFieldRender {
 
     my %FieldTemplateData = (
         'FieldName'               => ${FieldName},
-        'FieldLabel'              => $FieldLabel,
+        'FieldLabel'              => $FieldLabelEscaped,
         'Value'                   => $Value,
         'DetailedSearchMsg'       => $DetailedSearchMsg,
         'FieldClass'              => $FieldClass,
@@ -675,9 +678,12 @@ sub SearchFieldRender {
     my ( $Self, %Param ) = @_;
 
     # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldName   = 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
+    my $FieldConfig       = $Param{DynamicFieldConfig}->{Config};
+    my $FieldName         = 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name};
+    my $FieldLabel        = $Param{DynamicFieldConfig}->{Label};
+    my $FieldLabelEscaped = $Param{LayoutObject}->Ascii2Html(
+        Text => $Param{LayoutObject}->{LanguageObject}->Translate($FieldLabel),
+    );
 
     # set the field value
     my $Value = ( defined $Param{DefaultValue} ? $Param{DefaultValue} : '' );
@@ -699,7 +705,7 @@ sub SearchFieldRender {
     my $FieldClass = 'DynamicFieldDB';
 
     my $HTMLString = <<"EOF";
-<input type="text" class="$FieldClass" id="${FieldName}" name="${FieldName}" title="$FieldLabel" value="$Value" />
+<input type="text" class="$FieldClass" id="${FieldName}" name="${FieldName}" title="$FieldLabelEscaped" value="$Value" />
 EOF
 
     my $AdditionalText;
