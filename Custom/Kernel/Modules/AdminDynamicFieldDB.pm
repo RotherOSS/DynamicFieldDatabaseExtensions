@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/Modules/AdminDynamicFieldDB.pm
+# $origin: otobo - d263b841b02540f4eceaf3b625128e04fa1a0606 - Kernel/Modules/AdminDynamicFieldDB.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -154,10 +154,12 @@ sub _Add {
     my $FieldTypeName  = $ConfigObject->Get('DynamicFields::Driver')->{ $GetParam{FieldType} }->{DisplayName}      || '';
 
     # check namespace validity
-    my $Namespaces = $ConfigObject->Get('DynamicField::Namespaces');
-    my $Namespace  = '';
-    if ( IsArrayRefWithData($Namespaces) && $GetParam{NamespaceFilter} ) {
-        $Namespace = ( grep { $_ eq $GetParam{NamespaceFilter} } $Namespaces->@* ) ? $GetParam{NamespaceFilter} : '';
+    my @DFNamespaces = $Kernel::OM->Get('Kernel::System::Namespace')->NamespacesList(
+        Scope => 'DynamicField',
+    );
+    my $Namespace = '';
+    if ( @DFNamespaces && $GetParam{NamespaceFilter} ) {
+        $Namespace = ( grep { $_ eq $GetParam{NamespaceFilter} } @DFNamespaces ) ? $GetParam{NamespaceFilter} : '';
     }
 
     return $Self->_ShowScreen(
@@ -756,10 +758,12 @@ sub _ShowScreen {
     );
 
     # Build namespace selection
-    my $NamespaceList = $Kernel::OM->Get('Kernel::Config')->Get('DynamicField::Namespaces');
-    if ( IsArrayRefWithData($NamespaceList) ) {
+    my @DFNamespaces = $Kernel::OM->Get('Kernel::System::Namespace')->NamespacesList(
+        Scope => 'DynamicField',
+    );
+    if (@DFNamespaces) {
         my $NamespaceStrg = $LayoutObject->BuildSelection(
-            Data          => $NamespaceList,
+            Data          => \@DFNamespaces,
             Name          => 'Namespace',
             SelectedValue => $Namespace || '',
             PossibleNone  => 1,
@@ -1202,7 +1206,7 @@ sub _ShowScreen {
         );
     }
 
-    if ( IsArrayRefWithData($NamespaceList) ) {
+    if (@DFNamespaces) {
         if ( IsStringWithData( $Param{NamespaceFilter} ) ) {
             $FilterStrg .= ";NamespaceFilter=" . $LayoutObject->Output(
                 Template => '[% Data.Filter | uri %]',
