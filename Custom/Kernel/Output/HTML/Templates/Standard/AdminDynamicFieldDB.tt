@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 6efdc7bf2a3325277cd79a60f0f2407f8ad59e87 - Kernel/Output/HTML/Templates/Standard/AdminDynamicFieldDB.tt
+# $origin: otobo - 4bb1aebd3bb37a44ce6d9313f251df973bd0855a - Kernel/Output/HTML/Templates/Standard/AdminDynamicFieldDB.tt
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -67,6 +67,7 @@
             <input type="hidden" name="ObjectType" value="[% Data.ObjectType | html %]" />
             <input type="hidden" name="FieldType" value="[% Data.FieldType | html %]" />
             <input type="hidden" name="ObjectTypeFilter" value="[% Data.ObjectTypeFilter | html %]" />
+            <input type="hidden" name="FieldTypeFilter" value="[% Data.FieldTypeFilter | html %]" />
             <input type="hidden" name="NamespaceFilter" value="[% Data.NamespaceFilter | html %]" />
             <input type="hidden" name="ID" value="[% Data.ID | html %]" />
             <input type="hidden" name="ContinueAfterSave" id="ContinueAfterSave" value=""/>

@@ -4,7 +4,7 @@
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 # --
-# $origin: otobo - 7cc84ce13c8e6c3485605ade5585014abd911579 - Kernel/System/DynamicField/Driver/BaseDatabase.pm
+# $origin: otobo - 6037c557df653c401757d56455482d1cbab358c1 - Kernel/System/DynamicField/Driver/BaseDatabase.pm
 # --
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -82,8 +82,14 @@ sub ValueGet {
         return if !IsHashRefWithData( $DFValue->[0] );
 
         my @ReturnData;
-        for my $Value ( $DFValue->@* ) {
-            push @ReturnData, $Value->{ValueText};
+        for my $Item ( $DFValue->@* ) {
+            if ( $Param{Set} ) {
+                $ReturnData[ $Item->{IndexSet} ] //= [];
+                push $ReturnData[ $Item->{IndexSet} ]->@*, $Item->{ValueText};
+            }
+            else {
+                push @ReturnData, $Item->{ValueText};
+            }
         }
         return \@ReturnData;
     }
@@ -91,6 +97,7 @@ sub ValueGet {
     return $Self->ValueStructureFromDB(
         ValueDB    => $DFValue,
         ValueKey   => 'ValueText',
+        Set        => $Param{Set},
         MultiValue => $Param{DynamicFieldConfig}{Config}{MultiValue},
         BaseArray  => !$Param{DynamicFieldConfig}{Config}{MultiValue},
     );
@@ -99,36 +106,61 @@ sub ValueGet {
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    # check value
-    my $Value;
-    if ( ref $Param{Value} eq 'ARRAY' ) {
-        if (
-            !$Param{DynamicFieldConfig}{Config}{MultiValue}
-            && !$Param{DynamicFieldConfig}{Config}{Multiselect}
-            )
-        {
-            $Value = $Param{Value}->[0];
+    if ( $Param{DynamicFieldConfig}{Config}{Multiselect} ) {
+
+        my $Value;
+        if ( $Param{Set} ) {
+            if ( IsArrayRefWithData( $Param{Value} ) ) {
+                VALUEITEM:
+                for my $ValueIndex ( 0 .. $#{ $Param{Value} } ) {
+                    my $ValueItem = $Param{Value}[$ValueIndex];
+                    if ( ref $ValueItem eq 'ARRAY' ) {
+                        push $Value->@*, map { { IndexSet => $ValueIndex, ValueText => $_ } } $ValueItem->@*;
+                    }
+                    else {
+                        push $Value->@*, map { { IndexSet => $ValueIndex, ValueText => $_ } } ( split /,/, $ValueItem // '' );
+                    }
+                }
+            }
+        }
+
+        elsif ( ref $Param{Value} eq 'ARRAY' ) {
+            $Value = [ map { { ValueText => $_ } } $Param{Value}->@* ];
         }
         else {
-            $Value = $Param{Value};
+            $Value = [ map { { ValueText => $_ } } ( split /,/, $Param{Value} // '' ) ];
         }
-    }
-    elsif ( $Param{DynamicFieldConfig}{Config}{Multiselect} ) {
-        my @Values = split /,/, $Param{Value} // '';
-        if ( IsArrayRefWithData( \@Values ) ) {
-            $Value = \@Values;
+
+# Rother OSS / DynamicFieldDatabaseExtensions
+        # delete DisplayValueRender cache per item
+        my @ValueItems = IsArrayRefWithData($Value) ? $Value->@* : ($Value);
+        VALUEITEM:
+        for my $ValueItem ( @ValueItems ) {
+            next VALUEITEM unless $ValueItem;
+            next VALUEITEM unless $ValueItem->{ValueText};
+
+            for my $Interface (qw(AgentInterface CustomerInterface)) {
+
+                # NOTE $ValueItem is the PossibleValues element marked as Identifier
+                $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+                    Type => 'DynamicFieldDB',
+                    Key  => "$Param{DynamicFieldConfig}->{ID}-$Interface-$ValueItem->{Text}",
+                );
+            }
         }
-        else {
-            $Value = [ $Param{Value} ];
-        }
-    }
-    else {
-        $Value = $Param{Value};
+# EO DynamicFieldDatabaseExtensions
+
+        return $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            Value    => $Value,
+            UserID   => $Param{UserID},
+        );
     }
 
 # Rother OSS / DynamicFieldDatabaseExtensions
     # delete DisplayValueRender cache per item
-    my @ValueItems = IsArrayRefWithData($Value) ? $Value->@* : ($Value);
+    my @ValueItems = IsArrayRefWithData($Param{Value}) ? $Param{Value}->@* : ($Param{Value});
     VALUEITEM:
     for my $ValueItem ( @ValueItems ) {
         next VALUEITEM unless $ValueItem;
@@ -142,20 +174,14 @@ sub ValueSet {
             );
         }
     }
-
 # EO DynamicFieldDatabaseExtensions
-    # Make sure that the input is not modified in ValueSet()
-    my $DBValue;
-    if ( $Param{DynamicFieldConfig}{Config}{Multiselect} ) {
-        $DBValue = [ map { { 'ValueText' => $_ } } $Value->@* ];
-    }
-    else {
-        $DBValue = $Self->ValueStructureToDB(
-            Value      => $Value,
-            ValueKey   => 'ValueText',
-            MultiValue => $Param{DynamicFieldConfig}{Config}{MultiValue} || $Param{DynamicFieldConfig}{Config}{Multiselect},
-        );
-    }
+
+    my $DBValue = $Self->ValueStructureToDB(
+        Value      => $Param{Value},
+        ValueKey   => 'ValueText',
+        Set        => $Param{Set},
+        MultiValue => $Param{DynamicFieldConfig}{Config}{MultiValue},
+    );
 
     return $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
@@ -350,10 +376,18 @@ sub EditFieldRender {
         @Values = ( $Param{Value} );
     }
 
-    # Set new line separator.
-    my $ItemSeparator = ', ';
+    if ( $FieldConfig->{Multiselect} ) {
 
-    $Value = join $ItemSeparator, @Values;
+        # prevent joining undef values
+        @Values = map { $_ // '' } @Values;
+
+        # Set new line separator.
+        my $ItemSeparator = ', ';
+        $Value = join $ItemSeparator, @Values;
+    }
+    else {
+        $Value = \@Values;
+    }
 
     # Extract the dynamic field value from the web request and set it if present. Do this after
     #   stored value is retrieved and processed, so it can be overridden if form has refreshed for
@@ -545,7 +579,7 @@ sub EditFieldValueGet {
         };
     }
 
-    # for this field the normal return an the ReturnValueStructure are the same
+    # for this field the normal return and the ReturnValueStructure are the same
     return $Value;
 }
 
@@ -563,7 +597,7 @@ sub EditFieldValueValidate {
 
     my $ServerError;
 
-    # ref comparison because EditFieldValuetet returns an arrayref except when using template value
+    # ref comparison because EditFieldValueGet returns an array reference except when using template value
     if ( ref $Value ne 'ARRAY' ) {
         $Value = [$Value];
     }

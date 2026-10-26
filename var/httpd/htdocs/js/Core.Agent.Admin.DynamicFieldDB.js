@@ -4,7 +4,7 @@
 // Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 // Copyright (C) 2019-2026 Rother OSS GmbH, https://otobo.io/
 // --
-// $origin: otobo - ff9e297baf287e16071d3ac6ad7f6c13f11ac7fa - var/httpd/htdocs/js/Core.Agent.Admin.DynamicFieldDB.js
+// $origin: otobo - cbfecd009b404dce4b3dea4d5d2eae1518d4c4c0 - var/httpd/htdocs/js/Core.Agent.Admin.DynamicFieldDB.js
 // --
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -46,8 +46,10 @@ Core.Agent.Admin.DynamicFieldDB = (function (TargetNS) {
 
         // get the number of the selector id and
         // use it as the select key
-        /.*?_(\d+)/.exec(IDSelector);
-        IdentifierKey = RegExp.$1;
+        let MatchingResult = /.*?_(\d+)/.exec(IDSelector);
+        if (MatchingResult) {
+            IdentifierKey = MatchingResult[1];
+        }
 
         // remove the related item if the complete line was removed
         if (Remove) {
@@ -64,7 +66,7 @@ Core.Agent.Admin.DynamicFieldDB = (function (TargetNS) {
             ElementUpdated = 0;
 
             // search for the select option and update the text
-            $('#Identifier option').each(function(Key, Value) {
+            $('#Identifier option').each(function(_Key, Value) {
                 if (Value.value === IdentifierKey) {
                     $(this).text(IdentifierValue);
                     ElementUpdated = 1;
